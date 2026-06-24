@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+.venv/
+env/
+venv/
+
+# Environment Variables
+.env
+.env.*
+!sample.env
+
+# Django
+db.sqlite3
+*.log
+
+# Compiled Assets
+staticfiles/
+
+# Cache
+.cache/
+
+# Media files
+media/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+
+# Django-extensions
+.django_extensions/
+
+# Pytest
+.pytest_cache/
+
+# HTMLCOV directory for coverage.py
+htmlcov/
+
+# Coverage.py
+.coverage
+.coverage.*
+.coverage.xml
+
+# HTMLcov
+htmlcov
+
+# Reports directory
+reports/
+
+# Debug log
+*.log
+
+# Supabase
+.supabase/
