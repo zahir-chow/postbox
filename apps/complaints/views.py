@@ -19,7 +19,7 @@ from rest_framework.views import APIView
 
 from core.storage import get_s3_generator
 
-from .models import Complaint, ComplaintStatus, ComplaintStatusLog
+from .models import Complaint, ComplaintStatus, ComplaintStatusLog, UnionParishad
 from .permissions import IsUPMember, IsUPMemberOrComplaintOwner
 from .serializers import (
     ComplaintCreateSerializer,
@@ -28,6 +28,7 @@ from .serializers import (
     ComplaintStatusUpdateSerializer,
     ComplaintTrackingSerializer,
     PresignedURLRequestSerializer,
+    UnionParishadSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -142,8 +143,8 @@ class ComplaintListView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
 
-        if user.is_up_member:
-            # Admin sees all complaints
+        if user.is_up_member or user.is_chairman:
+            # Admin and Chairman see all complaints
             qs = Complaint.objects.select_related(
                 "union_parishad", "complainant"
             ).all()
@@ -254,9 +255,14 @@ class ComplaintStatusUpdateView(APIView):
 
         # Notify via WebSocket
         try:
-            from apps.notifications.utils import notify_admin_status_change
+            if new_status == ComplaintStatus.ESCALATED:
+                from apps.notifications.utils import notify_chairman_escalation
 
-            notify_admin_status_change(complaint, old_status, new_status)
+                notify_chairman_escalation(complaint)
+            else:
+                from apps.notifications.utils import notify_admin_status_change
+
+                notify_admin_status_change(complaint, old_status, new_status)
         except Exception:
             logger.exception("Failed to send status change notification")
 
@@ -391,3 +397,24 @@ class AdminDashboardStatsView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+# =========================================================================
+# Union Parishad List (Public)
+# =========================================================================
+
+
+class UnionParishadListView(generics.ListAPIView):
+    """
+    List all active Union Parishads.
+
+    GET /api/v1/complaints/union-parishads/
+
+    Public endpoint used by the complaint submission form to populate
+    the Union Parishad dropdown.
+    """
+
+    serializer_class = UnionParishadSerializer
+    permission_classes = [permissions.AllowAny]
+    queryset = UnionParishad.objects.filter(is_active=True).order_by("name")
+    pagination_class = None  # Return all UPs without pagination

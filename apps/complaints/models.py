@@ -54,6 +54,7 @@ class ComplaintStatus(models.TextChoices):
     UNREAD = "UNREAD", _("Unread")
     UNDER_REVIEW = "UNDER_REVIEW", _("Under Review")
     IN_PROGRESS = "IN_PROGRESS", _("In Progress")
+    ESCALATED = "ESCALATED", _("Escalated to Chairman")
     RESOLVED = "RESOLVED", _("Resolved")
     REJECTED = "REJECTED", _("Rejected")
 

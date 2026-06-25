@@ -7,18 +7,18 @@ from rest_framework import permissions
 
 class IsUPMember(permissions.BasePermission):
     """
-    Allow access only to Union Parishad members (admins).
+    Allow access to Union Parishad members or the Chairman (admins).
 
-    Checks the ``is_up_member`` flag on the user model.
+    Checks the ``is_up_member`` and ``is_chairman`` flags on the user model.
     """
 
-    message = "Only Union Parishad members can perform this action."
+    message = "Only Union Parishad members or the Chairman can perform this action."
 
     def has_permission(self, request, view):
         return (
             request.user
             and request.user.is_authenticated
-            and request.user.is_up_member
+            and (request.user.is_up_member or request.user.is_chairman)
         )
 
 
@@ -40,7 +40,7 @@ class IsComplaintOwner(permissions.BasePermission):
 
 class IsUPMemberOrComplaintOwner(permissions.BasePermission):
     """
-    Allow access to UP members (full access) or complaint owners (own only).
+    Allow access to UP members/Chairman (full access) or complaint owners (own only).
     """
 
     message = "Access denied."
@@ -50,8 +50,8 @@ class IsUPMemberOrComplaintOwner(permissions.BasePermission):
         if not user or not user.is_authenticated:
             return False
 
-        # UP members can access any complaint
-        if user.is_up_member:
+        # UP members and Chairman can access any complaint
+        if user.is_up_member or user.is_chairman:
             return True
 
         # Regular users can only access their own complaints

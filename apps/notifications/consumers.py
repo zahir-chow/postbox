@@ -55,9 +55,9 @@ class AdminNotificationConsumer(AsyncJsonWebsocketConsumer):
             await self.close(code=4001)
             return
 
-        if not getattr(user, "is_up_member", False):
+        if not (getattr(user, "is_up_member", False) or getattr(user, "is_chairman", False)):
             logger.warning(
-                "Rejected WebSocket from non-UP-member: %s", user.username
+                "Rejected WebSocket from non-UP-member/Chairman: %s", user.username
             )
             await self.close(code=4003)
             return
@@ -137,4 +137,13 @@ class AdminNotificationConsumer(AsyncJsonWebsocketConsumer):
             "complaint_id": event.get("complaint_id"),
             "subject": event.get("subject"),
             "error": event.get("error"),
+        })
+
+    async def complaint_escalated(self, event):
+        """Notify Chairman/admin of escalated complaint."""
+        await self.send_json({
+            "type": "complaint_escalated",
+            "complaint_id": event.get("complaint_id"),
+            "subject": event.get("subject"),
+            "escalated_at": event.get("escalated_at"),
         })

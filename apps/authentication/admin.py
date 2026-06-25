@@ -21,11 +21,13 @@ class UserAdmin(BaseUserAdmin):
         "nid_name",
         "nid_verified",
         "is_up_member",
+        "is_chairman",
         "is_active",
         "date_joined",
     ]
     list_filter = [
         "is_up_member",
+        "is_chairman",
         "nid_verified",
         "is_active",
         "is_staff",
@@ -57,6 +59,7 @@ class UserAdmin(BaseUserAdmin):
             {
                 "fields": (
                     "is_up_member",
+                    "is_chairman",
                     "phone_number",
                     "avatar_url",
                 ),

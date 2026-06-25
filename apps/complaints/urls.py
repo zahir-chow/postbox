@@ -41,4 +41,11 @@ urlpatterns = [
 
     # ── Admin Dashboard Stats ────────────────────────────────────────────
     path("admin/stats/", views.AdminDashboardStatsView.as_view(), name="admin-stats"),
+
+    # ── Union Parishad List (AllowAny) ───────────────────────────────────
+    path(
+        "union-parishads/",
+        views.UnionParishadListView.as_view(),
+        name="union-parishad-list",
+    ),
 ]

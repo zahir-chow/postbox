@@ -103,6 +103,12 @@ class User(AbstractUser):
         help_text=_("Whether this user is a Union Parishad member/admin."),
     )
 
+    is_chairman = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text=_("Whether this user is the Union Parishad Chairman."),
+    )
+
     # ── Profile ──────────────────────────────────────────────────────────
     avatar_url = models.URLField(
         blank=True,
@@ -125,6 +131,10 @@ class User(AbstractUser):
             models.Index(
                 fields=["is_up_member", "is_active"],
                 name="idx_user_up_member",
+            ),
+            models.Index(
+                fields=["is_chairman", "is_active"],
+                name="idx_user_chairman",
             ),
         ]
 

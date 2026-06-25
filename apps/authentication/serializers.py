@@ -13,7 +13,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     """
     Custom JWT token serializer that embeds additional claims.
 
-    Adds ``is_up_member`` and ``nid_verified`` flags to the token
+    Adds ``is_up_member``, ``is_chairman``, and ``nid_verified`` flags to the token
     payload so the frontend can determine user role without an
     additional API call.
     """
@@ -22,6 +22,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
         token["is_up_member"] = user.is_up_member
+        token["is_chairman"] = user.is_chairman
         token["nid_verified"] = user.nid_verified
         token["display_name"] = user.display_name
         return token
@@ -47,6 +48,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "nid_address",
             "nid_verified",
             "is_up_member",
+            "is_chairman",
             "avatar_url",
             "date_joined",
         ]

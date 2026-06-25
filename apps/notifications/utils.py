@@ -114,3 +114,18 @@ def notify_admin_new_verification(nid_task):
         nid_task.status,
         complaint.id,
     )
+
+
+def notify_chairman_escalation(complaint):
+    """
+    Notify admin dashboard/Chairman of a complaint escalation to the Chairman.
+
+    Called from the ComplaintStatusUpdateView when status is updated to ESCALATED.
+    """
+    _send_to_admin_group({
+        "type": "complaint_escalated",
+        "complaint_id": str(complaint.id),
+        "subject": complaint.subject,
+        "escalated_at": complaint.updated_at.isoformat() if complaint.updated_at else "",
+    })
+    logger.info("Sent complaint_escalated notification for: %s", complaint.id)

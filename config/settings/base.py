@@ -238,10 +238,10 @@ RATE_LIMIT_UPLOADS_PER_HOUR = int(
 RATE_LIMIT_REDIS_URL = os.environ.get("REDIS_URL", "redis://127.0.0.1:6379/0")
 
 # ---------------------------------------------------------------------------
-# CORS — Allow Next.js frontend
+# CORS — Allow frontend dev servers
 # ---------------------------------------------------------------------------
 CORS_ALLOWED_ORIGINS = os.environ.get(
-    "CORS_ALLOWED_ORIGINS", "http://localhost:3000"
+    "CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:5173"
 ).split(",")
 CORS_ALLOW_CREDENTIALS = True
 
