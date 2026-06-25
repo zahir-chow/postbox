@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useLanguage } from '../../context/LanguageContext';
 import { HiOutlineEnvelope } from 'react-icons/hi2';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/ui/Button';
@@ -8,6 +9,7 @@ import './Login.css';
 
 export default function Login() {
   const { login } = useAuth();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -16,14 +18,16 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!username.trim() || !password.trim()) {
-      toast.error('Please enter username and password');
+      toast.error(
+        language === 'en' ? 'Please enter username and password' : 'অনুগ্রহ করে ইউজারনেম এবং পাসওয়ার্ড লিখুন'
+      );
       return;
     }
 
     setLoading(true);
     try {
       const claims = await login(username, password);
-      toast.success('Welcome back!');
+      toast.success(language === 'en' ? 'Welcome back!' : 'স্বাগতম!');
 
       if (claims.is_up_member || claims.is_chairman) {
         navigate('/dashboard');
@@ -32,7 +36,9 @@ export default function Login() {
       }
     } catch (err) {
       const detail = err.response?.data?.detail;
-      toast.error(detail || 'Invalid username or password');
+      toast.error(
+        detail || (language === 'en' ? 'Invalid username or password' : 'ভুল ইউজারনেম অথবা পাসওয়ার্ড')
+      );
     } finally {
       setLoading(false);
     }
@@ -51,17 +57,17 @@ export default function Login() {
             <div className="login-logo">
               <HiOutlineEnvelope size={28} />
             </div>
-            <h1 className="login-title">Welcome Back</h1>
-            <p className="login-subtitle">Sign in to your PostBox account</p>
+            <h1 className="login-title">{t('login.welcomeBack')}</h1>
+            <p className="login-subtitle">{t('login.signInSubtitle')}</p>
           </div>
 
           <form className="login-form" onSubmit={handleSubmit}>
             <div className="form-group">
-              <label className="form-label" htmlFor="login-username">Username</label>
+              <label className="form-label" htmlFor="login-username">{t('login.username')}</label>
               <input
                 id="login-username"
                 type="text"
-                placeholder="Enter your username"
+                placeholder={t('login.placeholderUsername')}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 autoComplete="username"
@@ -70,11 +76,11 @@ export default function Login() {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="login-password">Password</label>
+              <label className="form-label" htmlFor="login-password">{t('login.password')}</label>
               <input
                 id="login-password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder={t('login.placeholderPassword')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
@@ -88,14 +94,14 @@ export default function Login() {
               fullWidth
               loading={loading}
             >
-              Sign In
+              {t('login.signInBtn')}
             </Button>
           </form>
 
           <div className="login-footer">
             <p>
-              Don&apos;t have an account?{' '}
-              <Link to="/submit">Submit a complaint</Link> with NID verification to get one automatically.
+              {t('login.dontHaveAccount')}{' '}
+              <Link to="/submit">{t('home.submitCTA')}</Link> {t('login.nidHelp')}
             </p>
           </div>
         </div>

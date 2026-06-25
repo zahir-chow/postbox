@@ -1,8 +1,13 @@
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
 import { HiOutlineEnvelope, HiOutlineMagnifyingGlass, HiOutlineShieldCheck, HiOutlineClock, HiOutlineBell, HiOutlineUserGroup } from 'react-icons/hi2';
 import './Home.css';
 
 export default function Home() {
+  const { t } = useLanguage();
+  const { isAdmin } = useAuth();
+
   return (
     <div className="home-page">
       {/* Hero Section */}
@@ -16,25 +21,25 @@ export default function Home() {
           <div className="hero-text animate-fade-in-up">
             <div className="hero-badge">
               <HiOutlineShieldCheck size={16} />
-              Secure & Anonymous
+              {t('home.secureAnonymous')}
             </div>
             <h1 className="hero-title">
-              Your Voice Matters.{' '}
-              <span className="gradient-text">Make It Heard.</span>
+              {t('home.titlePart1')}{' '}
+              <span className="gradient-text">{t('home.titlePart2')}</span>
             </h1>
             <p className="hero-subtitle">
-              Smart Union Postbox empowers citizens to file complaints with their
-              Union Parishad — anonymously or with NID verification. Track progress
-              in real-time.
+              {t('home.heroSubtitle')}
             </p>
             <div className="hero-actions">
-              <Link to="/submit" className="btn btn-primary btn-lg" id="cta-submit">
-                <HiOutlineEnvelope size={20} />
-                <span className="btn-label">Submit a Complaint</span>
-              </Link>
+              {!isAdmin && (
+                <Link to="/submit" className="btn btn-primary btn-lg" id="cta-submit">
+                  <HiOutlineEnvelope size={20} />
+                  <span className="btn-label">{t('home.submitCTA')}</span>
+                </Link>
+              )}
               <Link to="/track" className="btn btn-outline btn-lg" id="cta-track">
                 <HiOutlineMagnifyingGlass size={20} />
-                <span className="btn-label">Track Your Complaint</span>
+                <span className="btn-label">{t('home.trackCTA')}</span>
               </Link>
             </div>
           </div>
@@ -45,10 +50,10 @@ export default function Home() {
       <section className="how-it-works" id="how-it-works">
         <div className="container">
           <h2 className="section-title animate-fade-in">
-            How It <span className="gradient-text">Works</span>
+            {t('home.howItWorks')}
           </h2>
           <p className="section-subtitle animate-fade-in">
-            Three simple steps to make your voice heard
+            {t('home.threeSteps')}
           </p>
 
           <div className="steps-grid">
@@ -57,10 +62,9 @@ export default function Home() {
               <div className="step-icon">
                 <HiOutlineEnvelope size={32} />
               </div>
-              <h3 className="step-title">Submit Your Complaint</h3>
+              <h3 className="step-title">{t('home.step1Title')}</h3>
               <p className="step-desc">
-                Fill out a simple form with your complaint details. Choose to remain
-                anonymous or verify with your NID for faster processing.
+                {t('home.step1Desc')}
               </p>
             </div>
 
@@ -69,10 +73,9 @@ export default function Home() {
               <div className="step-icon">
                 <HiOutlineClock size={32} />
               </div>
-              <h3 className="step-title">Track Progress</h3>
+              <h3 className="step-title">{t('home.step2Title')}</h3>
               <p className="step-desc">
-                Receive a unique tracking token. Use it anytime to check the current
-                status and see the full timeline of your complaint.
+                {t('home.step2Desc')}
               </p>
             </div>
 
@@ -81,10 +84,9 @@ export default function Home() {
               <div className="step-icon">
                 <HiOutlineBell size={32} />
               </div>
-              <h3 className="step-title">Get Resolution</h3>
+              <h3 className="step-title">{t('home.step3Title')}</h3>
               <p className="step-desc">
-                Your Union Parishad reviews and acts on complaints. The Chairman
-                handles escalated issues for faster resolution.
+                {t('home.step3Desc')}
               </p>
             </div>
           </div>
@@ -98,29 +100,29 @@ export default function Home() {
             <div className="feature-item animate-fade-in stagger-1">
               <HiOutlineShieldCheck size={24} className="feature-icon" />
               <div>
-                <h4>Fully Anonymous</h4>
-                <p>Your identity is protected. No registration needed.</p>
+                <h4>{t('home.feature1Title')}</h4>
+                <p>{t('home.feature1Desc')}</p>
               </div>
             </div>
             <div className="feature-item animate-fade-in stagger-2">
               <HiOutlineUserGroup size={24} className="feature-icon" />
               <div>
-                <h4>NID Verification</h4>
-                <p>Verify with your National ID for priority processing.</p>
+                <h4>{t('home.feature2Title')}</h4>
+                <p>{t('home.feature2Desc')}</p>
               </div>
             </div>
             <div className="feature-item animate-fade-in stagger-3">
               <HiOutlineClock size={24} className="feature-icon" />
               <div>
-                <h4>Real-time Updates</h4>
-                <p>Track your complaint status live, anytime.</p>
+                <h4>{t('home.feature3Title')}</h4>
+                <p>{t('home.feature3Desc')}</p>
               </div>
             </div>
             <div className="feature-item animate-fade-in stagger-4">
               <HiOutlineBell size={24} className="feature-icon" />
               <div>
-                <h4>Instant Notifications</h4>
-                <p>Admin dashboard receives real-time alerts.</p>
+                <h4>{t('home.feature4Title')}</h4>
+                <p>{t('home.feature4Desc')}</p>
               </div>
             </div>
           </div>
@@ -130,7 +132,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="home-footer">
         <div className="container">
-          <p>&copy; {new Date().getFullYear()} Smart Union Postbox. Built for the people of Bangladesh.</p>
+          <p>&copy; {new Date().getFullYear()} {t('home.copyright')}</p>
         </div>
       </footer>
     </div>

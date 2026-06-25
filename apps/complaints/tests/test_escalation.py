@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import patch, MagicMock
 from django.contrib.auth import get_user_model
 from rest_framework import status
-from rest_framework.test import APIRequestFactory
+from rest_framework.test import APIRequestFactory, force_authenticate
 
 from apps.complaints.models import Complaint, ComplaintStatus, UnionParishad
 from apps.complaints.permissions import IsUPMember, IsUPMemberOrComplaintOwner
@@ -137,7 +137,7 @@ class TestEscalationWorkflow:
             data,
             format="json"
         )
-        request.user = self.up_member
+        force_authenticate(request, user=self.up_member)
         
         response = view(request, pk=str(self.complaint.id))
         
@@ -170,7 +170,7 @@ class TestEscalationWorkflow:
             data,
             format="json"
         )
-        request.user = self.up_member
+        force_authenticate(request, user=self.up_member)
         
         response = view(request, pk=str(self.complaint.id))
         

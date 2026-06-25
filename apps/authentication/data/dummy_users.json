@@ -1,0 +1,44 @@
+[
+  {
+    "username": "citizen_rahim",
+    "email": "rahim@example.com",
+    "password": "Password123!",
+    "first_name": "Rahim",
+    "last_name": "Khan",
+    "phone_number": "+8801711111111",
+    "nid_number": "1234567890",
+    "nid_name": "Rahim Khan",
+    "nid_address": "House 12, Road 5, Sanora, Dhamrai, Dhaka",
+    "nid_verified": true,
+    "is_up_member": false,
+    "is_chairman": false
+  },
+  {
+    "username": "member_karim",
+    "email": "karim@example.com",
+    "password": "Password123!",
+    "first_name": "Karim",
+    "last_name": "Ahmed",
+    "phone_number": "+8801822222222",
+    "nid_number": "2345678901",
+    "nid_name": "Karim Ahmed",
+    "nid_address": "Word No. 3, Sanora UP, Dhamrai, Dhaka",
+    "nid_verified": true,
+    "is_up_member": true,
+    "is_chairman": false
+  },
+  {
+    "username": "chairman_selim",
+    "email": "selim@example.com",
+    "password": "Password123!",
+    "first_name": "Selim",
+    "last_name": "Uddin",
+    "phone_number": "+8801933333333",
+    "nid_number": "3456789012",
+    "nid_name": "Selim Uddin",
+    "nid_address": "Chairman House, Sanora, Dhamrai, Dhaka",
+    "nid_verified": true,
+    "is_up_member": true,
+    "is_chairman": true
+  }
+]

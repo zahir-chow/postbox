@@ -1,22 +1,29 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useLanguage } from '../../context/LanguageContext';
 import { HiOutlineCloudArrowUp, HiOutlineXMark, HiOutlineClipboardDocument, HiOutlineCheckCircle, HiOutlineArrowLeft, HiOutlineArrowRight } from 'react-icons/hi2';
 import Button from '../../components/ui/Button';
 import complaintService from '../../api/complaintService';
 import { formatFileSize, copyToClipboard } from '../../utils/helpers';
 import './SubmitComplaint.css';
 
-const STEPS = ['Details', 'Identity', 'Attachments', 'Review'];
-
 export default function SubmitComplaint() {
   const navigate = useNavigate();
+  const { t, language } = useLanguage();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [unionParishads, setUnionParishads] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const [trackingToken, setTrackingToken] = useState('');
   const fileInputRef = useRef(null);
+
+  const steps = [
+    t('submit.stepDetails'),
+    t('submit.stepIdentity'),
+    t('submit.stepAttachments'),
+    t('submit.stepReview')
+  ];
 
   const [form, setForm] = useState({
     union_parishad: '',
@@ -51,7 +58,7 @@ export default function SubmitComplaint() {
   const handleFileUpload = async (files) => {
     for (const file of files) {
       if (form.attachments.length + uploadingFiles.length >= 5) {
-        toast.error('Maximum 5 attachments allowed');
+        toast.error(t('submit.maxAttachments'));
         return;
       }
 
@@ -90,10 +97,18 @@ export default function SubmitComplaint() {
         }));
 
         setUploadingFiles((prev) => prev.filter((f) => f.id !== uploadId));
-        toast.success(`${file.name} uploaded`);
+        toast.success(
+          language === 'en' 
+            ? `${file.name} uploaded` 
+            : `${file.name} আপলোড সম্পন্ন`
+        );
       } catch {
         setUploadingFiles((prev) => prev.filter((f) => f.id !== uploadId));
-        toast.error(`Failed to upload ${file.name}`);
+        toast.error(
+          language === 'en' 
+            ? `Failed to upload ${file.name}` 
+            : `${file.name} আপলোড ব্যর্থ হয়েছে`
+        );
       }
     }
   };
@@ -110,9 +125,13 @@ export default function SubmitComplaint() {
 
       updateForm('nid_image_url', presigned.upload_url.split('?')[0]);
       updateForm('nid_image_object_key', presigned.object_key);
-      toast.success('NID image uploaded');
+      toast.success(
+        language === 'en' ? 'NID image uploaded' : 'এনআইডি ছবি আপলোড সম্পন্ন'
+      );
     } catch {
-      toast.error('Failed to upload NID image');
+      toast.error(
+        language === 'en' ? 'Failed to upload NID image' : 'এনআইডি ছবি আপলোড ব্যর্থ হয়েছে'
+      );
     }
   };
 
@@ -142,7 +161,9 @@ export default function SubmitComplaint() {
       const result = await complaintService.submitComplaint(payload);
       setTrackingToken(result.tracking_token);
       setSubmitted(true);
-      toast.success('Complaint submitted successfully!');
+      toast.success(
+        language === 'en' ? 'Complaint submitted successfully!' : 'অভিযোগটি সফলভাবে দাখিল করা হয়েছে!'
+      );
     } catch (err) {
       const detail = err.response?.data?.detail || err.response?.data;
       if (typeof detail === 'string') {
@@ -151,7 +172,9 @@ export default function SubmitComplaint() {
         const firstError = Object.values(detail)[0];
         toast.error(Array.isArray(firstError) ? firstError[0] : String(firstError));
       } else {
-        toast.error('Failed to submit complaint');
+        toast.error(
+          language === 'en' ? 'Failed to submit complaint' : 'অভিযোগ দাখিল করতে ব্যর্থ হয়েছে'
+        );
       }
     } finally {
       setLoading(false);
@@ -182,9 +205,9 @@ export default function SubmitComplaint() {
             <div className="success-icon">
               <HiOutlineCheckCircle size={64} />
             </div>
-            <h2>Complaint Submitted!</h2>
+            <h2>{t('submit.successTitle')}</h2>
             <p className="success-message">
-              Your complaint has been received. Use the tracking token below to check your status anytime.
+              {t('submit.successMessage')}
             </p>
             <div className="tracking-token-display">
               <code className="tracking-token-value">{trackingToken}</code>
@@ -192,19 +215,19 @@ export default function SubmitComplaint() {
                 className="btn btn-ghost btn-sm"
                 onClick={() => {
                   copyToClipboard(trackingToken);
-                  toast.success('Token copied!');
+                  toast.success(t('common.copied'));
                 }}
               >
                 <HiOutlineClipboardDocument size={18} />
-                Copy
+                {t('common.copy')}
               </button>
             </div>
             <div className="success-actions">
               <Button variant="primary" onClick={() => navigate(`/track?token=${trackingToken}`)}>
-                Track My Complaint
+                {t('submit.successTrack')}
               </Button>
               <Button variant="ghost" onClick={() => navigate('/')}>
-                Back to Home
+                {t('submit.successHome')}
               </Button>
             </div>
           </div>
@@ -218,13 +241,13 @@ export default function SubmitComplaint() {
       <div className="container">
         <div className="submit-wrapper">
           <div className="submit-header animate-fade-in">
-            <h1>Submit a <span className="gradient-text">Complaint</span></h1>
-            <p>Fill in the details below. Your complaint will be reviewed by your Union Parishad.</p>
+            <h1>{t('submit.titlePart1')}<span className="gradient-text">{t('submit.titlePart2')}</span></h1>
+            <p>{t('submit.subtitle')}</p>
           </div>
 
           {/* Step Indicator */}
           <div className="step-indicator animate-fade-in">
-            {STEPS.map((label, i) => (
+            {steps.map((label, i) => (
               <div
                 key={label}
                 className={`step-dot ${i === step ? 'step-active' : ''} ${i < step ? 'step-done' : ''}`}
@@ -234,7 +257,7 @@ export default function SubmitComplaint() {
                 <span className="step-dot-label">{label}</span>
               </div>
             ))}
-            <div className="step-line" style={{ '--progress': `${(step / (STEPS.length - 1)) * 100}%` }} />
+            <div className="step-line" style={{ '--progress': `${(step / (steps.length - 1)) * 100}%` }} />
           </div>
 
           {/* Form Steps */}
@@ -243,13 +266,13 @@ export default function SubmitComplaint() {
             {step === 0 && (
               <div className="form-step">
                 <div className="form-group">
-                  <label className="form-label" htmlFor="union_parishad">Union Parishad</label>
+                  <label className="form-label" htmlFor="union_parishad">{t('submit.labelUP')}</label>
                   <select
                     id="union_parishad"
                     value={form.union_parishad}
                     onChange={(e) => updateForm('union_parishad', e.target.value)}
                   >
-                    <option value="">Select a Union Parishad…</option>
+                    <option value="">{t('submit.placeholderUP')}</option>
                     {unionParishads.map((up) => (
                       <option key={up.id} value={up.id}>
                         {up.name} — {up.upazila}, {up.district}
@@ -259,11 +282,11 @@ export default function SubmitComplaint() {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label" htmlFor="subject">Subject</label>
+                  <label className="form-label" htmlFor="subject">{t('submit.labelSubject')}</label>
                   <input
                     id="subject"
                     type="text"
-                    placeholder="Brief subject of your complaint…"
+                    placeholder={t('submit.placeholderSubject')}
                     value={form.subject}
                     onChange={(e) => updateForm('subject', e.target.value)}
                     maxLength={300}
@@ -272,10 +295,10 @@ export default function SubmitComplaint() {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label" htmlFor="body">Description</label>
+                  <label className="form-label" htmlFor="body">{t('submit.labelDesc')}</label>
                   <textarea
                     id="body"
-                    placeholder="Describe your complaint in detail…"
+                    placeholder={t('submit.placeholderDesc')}
                     value={form.body}
                     onChange={(e) => updateForm('body', e.target.value)}
                     rows={6}
@@ -287,7 +310,7 @@ export default function SubmitComplaint() {
             {/* Step 2: Identity */}
             {step === 1 && (
               <div className="form-step">
-                <h3 className="form-step-title">How would you like to submit?</h3>
+                <h3 className="form-step-title">{t('submit.identityTitle')}</h3>
 
                 <div className="identity-options">
                   <label
@@ -300,8 +323,8 @@ export default function SubmitComplaint() {
                       onChange={() => updateForm('is_anonymous', true)}
                     />
                     <div className="identity-content">
-                      <h4>🕶️ Anonymous</h4>
-                      <p>Your identity will remain completely private. No registration required.</p>
+                      <h4>{t('submit.identityAnonTitle')}</h4>
+                      <p>{t('submit.identityAnonDesc')}</p>
                     </div>
                   </label>
 
@@ -315,8 +338,8 @@ export default function SubmitComplaint() {
                       onChange={() => updateForm('is_anonymous', false)}
                     />
                     <div className="identity-content">
-                      <h4>🪪 NID Verification</h4>
-                      <p>Verify with your National ID for priority processing and an auto-generated account.</p>
+                      <h4>{t('submit.identityNidTitle')}</h4>
+                      <p>{t('submit.identityNidDesc')}</p>
                     </div>
                   </label>
                 </div>
@@ -324,11 +347,11 @@ export default function SubmitComplaint() {
                 {!form.is_anonymous && (
                   <div className="nid-upload-section animate-fade-in">
                     <div className="form-group">
-                      <label className="form-label">Upload NID Card Photo</label>
+                      <label className="form-label">{t('submit.nidUploadLabel')}</label>
                       {form.nid_image_url ? (
                         <div className="nid-uploaded">
                           <HiOutlineCheckCircle size={20} />
-                          <span>NID image uploaded</span>
+                          <span>{t('submit.nidUploaded')}</span>
                           <button
                             className="btn btn-ghost btn-sm"
                             onClick={() => {
@@ -336,7 +359,7 @@ export default function SubmitComplaint() {
                               updateForm('nid_image_object_key', '');
                             }}
                           >
-                            Remove
+                            {t('common.remove')}
                           </button>
                         </div>
                       ) : (
@@ -351,8 +374,8 @@ export default function SubmitComplaint() {
                           }}
                         >
                           <HiOutlineCloudArrowUp size={32} />
-                          <p>Click or drag & drop your NID card photo</p>
-                          <span className="form-help">JPEG, PNG, or WebP (max 10 MB)</span>
+                          <p>{t('submit.nidUploadZone')}</p>
+                          <span className="form-help">{t('submit.nidUploadHelp')}</span>
                           <input
                             id="nid-input"
                             type="file"
@@ -374,8 +397,8 @@ export default function SubmitComplaint() {
             {/* Step 3: Attachments */}
             {step === 2 && (
               <div className="form-step">
-                <h3 className="form-step-title">Attach Evidence (Optional)</h3>
-                <p className="form-step-desc">Upload photos, documents, or any evidence related to your complaint.</p>
+                <h3 className="form-step-title">{t('submit.attachTitle')}</h3>
+                <p className="form-step-desc">{t('submit.attachDesc')}</p>
 
                 <div
                   className="file-drop-zone"
@@ -387,8 +410,8 @@ export default function SubmitComplaint() {
                   }}
                 >
                   <HiOutlineCloudArrowUp size={32} />
-                  <p>Click or drag & drop files here</p>
-                  <span className="form-help">Up to 5 files — JPEG, PNG, WebP, PDF (max 10 MB each)</span>
+                  <p>{t('submit.attachZone')}</p>
+                  <span className="form-help">{t('submit.attachHelp')}</span>
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -427,32 +450,32 @@ export default function SubmitComplaint() {
             {/* Step 4: Review */}
             {step === 3 && (
               <div className="form-step">
-                <h3 className="form-step-title">Review Your Complaint</h3>
+                <h3 className="form-step-title">{t('submit.reviewTitle')}</h3>
 
                 <div className="review-grid">
                   <div className="review-item">
-                    <span className="review-label">Union Parishad</span>
+                    <span className="review-label">{t('submit.labelUP')}</span>
                     <span className="review-value">
                       {unionParishads.find((up) => up.id === form.union_parishad)?.name || form.union_parishad}
                     </span>
                   </div>
                   <div className="review-item">
-                    <span className="review-label">Subject</span>
+                    <span className="review-label">{t('submit.labelSubject')}</span>
                     <span className="review-value">{form.subject}</span>
                   </div>
                   <div className="review-item review-item-full">
-                    <span className="review-label">Description</span>
+                    <span className="review-label">{t('submit.labelDesc')}</span>
                     <span className="review-value review-body">{form.body}</span>
                   </div>
                   <div className="review-item">
-                    <span className="review-label">Submission Type</span>
+                    <span className="review-label">{t('submit.reviewType')}</span>
                     <span className="review-value">
-                      {form.is_anonymous ? '🕶️ Anonymous' : '🪪 NID Verified'}
+                      {form.is_anonymous ? t('submit.identityAnonTitle') : t('submit.identityNidTitle')}
                     </span>
                   </div>
                   <div className="review-item">
-                    <span className="review-label">Attachments</span>
-                    <span className="review-value">{form.attachments.length} file(s)</span>
+                    <span className="review-label">{t('submit.reviewAttachments')}</span>
+                    <span className="review-value">{form.attachments.length} {t('submit.reviewFiles')}</span>
                   </div>
                 </div>
               </div>
@@ -463,17 +486,17 @@ export default function SubmitComplaint() {
               {step > 0 && (
                 <Button variant="ghost" onClick={() => setStep(step - 1)}>
                   <HiOutlineArrowLeft size={18} />
-                  Back
+                  {t('common.back')}
                 </Button>
               )}
               <div className="form-nav-spacer" />
-              {step < STEPS.length - 1 ? (
+              {step < steps.length - 1 ? (
                 <Button
                   variant="primary"
                   disabled={!canProceed()}
                   onClick={() => setStep(step + 1)}
                 >
-                  Next
+                  {t('common.next')}
                   <HiOutlineArrowRight size={18} />
                 </Button>
               ) : (
@@ -482,7 +505,7 @@ export default function SubmitComplaint() {
                   loading={loading}
                   onClick={handleSubmit}
                 >
-                  Submit Complaint
+                  {t('submit.btnSubmit')}
                 </Button>
               )}
             </div>

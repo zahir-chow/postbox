@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
+import { LanguageProvider } from './context/LanguageContext';
 import Navbar from './components/layout/Navbar';
 import DashboardLayout from './components/layout/DashboardLayout';
 import ProtectedRoute from './components/layout/ProtectedRoute';
@@ -19,47 +20,49 @@ import './App.css';
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Navbar />
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/submit" element={<SubmitComplaint />} />
-          <Route path="/track" element={<TrackComplaint />} />
+      <LanguageProvider>
+        <AuthProvider>
+          <Navbar />
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/submit" element={<SubmitComplaint />} />
+            <Route path="/track" element={<TrackComplaint />} />
 
-          {/* Auth Routes */}
-          <Route path="/login" element={<Login />} />
+            {/* Auth Routes */}
+            <Route path="/login" element={<Login />} />
 
-          {/* Dashboard Routes (Protected — Admin Only) */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute requireAdmin>
-                <DashboardLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<Dashboard />} />
-            <Route path="complaints" element={<ComplaintList />} />
-            <Route path="complaints/:id" element={<ComplaintDetail />} />
-          </Route>
-        </Routes>
+            {/* Dashboard Routes (Protected — Admin Only) */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Dashboard />} />
+              <Route path="complaints" element={<ComplaintList />} />
+              <Route path="complaints/:id" element={<ComplaintDetail />} />
+            </Route>
+          </Routes>
 
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            className: 'toast-custom',
-            duration: 4000,
-            style: {
-              background: 'hsl(222, 28%, 17%)',
-              color: 'hsl(220, 20%, 95%)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderRadius: '10px',
-              fontFamily: "'Inter', sans-serif",
-            },
-          }}
-        />
-      </AuthProvider>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              className: 'toast-custom',
+              duration: 4000,
+              style: {
+                background: 'hsl(222, 28%, 17%)',
+                color: 'hsl(220, 20%, 95%)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '10px',
+                fontFamily: "'Inter', sans-serif",
+              },
+            }}
+          />
+        </AuthProvider>
+      </LanguageProvider>
     </BrowserRouter>
   );
 }

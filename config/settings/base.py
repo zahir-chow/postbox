@@ -8,6 +8,7 @@ development.py and production.py.
 import os
 from datetime import timedelta
 from pathlib import Path
+from decouple import config, Csv
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -17,9 +18,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # ---------------------------------------------------------------------------
 # Security
 # ---------------------------------------------------------------------------
-SECRET_KEY = os.environ.get(
+SECRET_KEY = config(
     "DJANGO_SECRET_KEY",
-    "django-insecure-CHANGE-ME-before-deploying-to-production",
+    default="django-insecure-CHANGE-ME-before-deploying-to-production",
 )
 DEBUG = False
 ALLOWED_HOSTS: list[str] = []
@@ -95,11 +96,11 @@ ASGI_APPLICATION = "config.asgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DB_NAME", "postbox_db"),
-        "USER": os.environ.get("DB_USER", "postbox_user"),
-        "PASSWORD": os.environ.get("DB_PASSWORD", ""),
-        "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
-        "PORT": os.environ.get("DB_PORT", "5432"),
+        "NAME": config("DB_NAME", default="postbox_db"),
+        "USER": config("DB_USER", default="postbox_user"),
+        "PASSWORD": config("DB_PASSWORD", default=""),
+        "HOST": config("DB_HOST", default="127.0.0.1"),
+        "PORT": config("DB_PORT", default="5432"),
         "CONN_MAX_AGE": 600,
         "OPTIONS": {
             "connect_timeout": 5,
@@ -182,7 +183,7 @@ SIMPLE_JWT = {
 # ---------------------------------------------------------------------------
 # Celery (Redis broker)
 # ---------------------------------------------------------------------------
-CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0")
+CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://127.0.0.1:6379/0")
 CELERY_RESULT_BACKEND = "django-db"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
@@ -199,7 +200,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [os.environ.get("REDIS_URL", "redis://127.0.0.1:6379/0")],
+            "hosts": [config("REDIS_URL", default="redis://127.0.0.1:6379/0")],
         },
     },
 }
@@ -207,13 +208,13 @@ CHANNEL_LAYERS = {
 # ---------------------------------------------------------------------------
 # S3 / MinIO — Presigned URL configuration
 # ---------------------------------------------------------------------------
-AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "")
-AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", "")
-AWS_S3_BUCKET_NAME = os.environ.get("AWS_S3_BUCKET_NAME", "postbox-uploads")
-AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "ap-southeast-1")
-AWS_S3_ENDPOINT_URL = os.environ.get("AWS_S3_ENDPOINT_URL", None)  # None = real AWS
-AWS_S3_PRESIGNED_URL_EXPIRY = int(
-    os.environ.get("AWS_S3_PRESIGNED_URL_EXPIRY", "3600")
+AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID", default="")
+AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY", default="")
+AWS_S3_BUCKET_NAME = config("AWS_S3_BUCKET_NAME", default="postbox-uploads")
+AWS_S3_REGION_NAME = config("AWS_S3_REGION_NAME", default="ap-southeast-1")
+AWS_S3_ENDPOINT_URL = config("AWS_S3_ENDPOINT_URL", default=None)  # None = real AWS
+AWS_S3_PRESIGNED_URL_EXPIRY = config(
+    "AWS_S3_PRESIGNED_URL_EXPIRY", default=3600, cast=int
 )
 
 # Allowed file types for uploads
@@ -229,20 +230,22 @@ MAX_ATTACHMENTS_PER_COMPLAINT = 5
 # ---------------------------------------------------------------------------
 # Rate Limiting (Redis-backed, custom middleware)
 # ---------------------------------------------------------------------------
-RATE_LIMIT_COMPLAINTS_PER_HOUR = int(
-    os.environ.get("RATE_LIMIT_COMPLAINTS_PER_HOUR", "10")
+RATE_LIMIT_COMPLAINTS_PER_HOUR = config(
+    "RATE_LIMIT_COMPLAINTS_PER_HOUR", default=10, cast=int
 )
-RATE_LIMIT_UPLOADS_PER_HOUR = int(
-    os.environ.get("RATE_LIMIT_UPLOADS_PER_HOUR", "20")
+RATE_LIMIT_UPLOADS_PER_HOUR = config(
+    "RATE_LIMIT_UPLOADS_PER_HOUR", default=20, cast=int
 )
-RATE_LIMIT_REDIS_URL = os.environ.get("REDIS_URL", "redis://127.0.0.1:6379/0")
+RATE_LIMIT_REDIS_URL = config("REDIS_URL", default="redis://127.0.0.1:6379/0")
 
 # ---------------------------------------------------------------------------
 # CORS — Allow frontend dev servers
 # ---------------------------------------------------------------------------
-CORS_ALLOWED_ORIGINS = os.environ.get(
-    "CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:5173"
-).split(",")
+CORS_ALLOWED_ORIGINS = config(
+    "CORS_ALLOWED_ORIGINS",
+    default="http://localhost:3000,http://localhost:5173",
+    cast=Csv(),
+)
 CORS_ALLOW_CREDENTIALS = True
 
 # ---------------------------------------------------------------------------

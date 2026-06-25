@@ -117,9 +117,17 @@ class ComplaintCreateSerializer(serializers.ModelSerializer):
     def validate(self, data):
         """
         Validate complaint data:
+        - UP members and Chairmen are not allowed to submit complaints.
         - If not anonymous, NID image is required
         - Attachment count must not exceed limit
         """
+        request = self.context.get("request")
+        if request and request.user and request.user.is_authenticated:
+            if request.user.is_up_member or request.user.is_chairman:
+                raise serializers.ValidationError(
+                    "Only normal citizens can submit complaints."
+                )
+
         attachments = data.get("attachments", [])
         max_attachments = getattr(settings, "MAX_ATTACHMENTS_PER_COMPLAINT", 5)
 
@@ -142,6 +150,13 @@ class ComplaintCreateSerializer(serializers.ModelSerializer):
         nid_image_url = validated_data.pop("nid_image_url", "")
         nid_image_object_key = validated_data.pop("nid_image_object_key", "")
 
+        request = self.context.get("request")
+        is_authenticated_user = request and request.user and request.user.is_authenticated
+        if is_authenticated_user:
+            validated_data["complainant"] = request.user
+            from .models import NIDVerificationStatus
+            validated_data["nid_verification_status"] = NIDVerificationStatus.VERIFIED
+
         # Create the complaint
         complaint = Complaint.objects.create(**validated_data)
 
@@ -151,8 +166,8 @@ class ComplaintCreateSerializer(serializers.ModelSerializer):
                 complaint=complaint, **attachment_data
             )
 
-        # If non-anonymous with NID, create verification task and trigger Celery
-        if not complaint.is_anonymous and nid_image_url:
+        # If non-anonymous with NID and not authenticated, create verification task and trigger Celery
+        if not complaint.is_anonymous and nid_image_url and not is_authenticated_user:
             from .models import NIDVerificationStatus
 
             nid_task = NIDVerificationTask.objects.create(

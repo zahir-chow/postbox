@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { HiOutlineDocumentText, HiOutlineEye, HiOutlineClock, HiOutlineCheckCircle, HiOutlineXCircle, HiOutlineExclamationTriangle } from 'react-icons/hi2';
+import { HiOutlineDocumentText, HiOutlineEye, HiOutlineClock, HiOutlineCheckCircle } from 'react-icons/hi2';
+import { useLanguage } from '../../context/LanguageContext';
 import complaintService from '../../api/complaintService';
 import { PageSpinner } from '../../components/ui/Spinner';
 import './Dashboard.css';
 
 export default function Dashboard() {
+  const { t } = useLanguage();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -30,10 +32,10 @@ export default function Dashboard() {
   if (loading) return <PageSpinner />;
 
   const statCards = [
-    { label: 'Total Complaints', value: stats.total, icon: <HiOutlineDocumentText size={24} />, color: 'var(--accent-primary)' },
-    { label: 'Unread', value: stats.unread, icon: <HiOutlineEye size={24} />, color: 'var(--status-unread)' },
-    { label: 'In Progress', value: stats.in_progress, icon: <HiOutlineClock size={24} />, color: 'var(--status-progress)' },
-    { label: 'Resolved', value: stats.resolved, icon: <HiOutlineCheckCircle size={24} />, color: 'var(--status-resolved)' },
+    { label: t('dashboard.totalComplaints'), value: stats.total, icon: <HiOutlineDocumentText size={24} />, color: 'var(--accent-primary)' },
+    { label: t('dashboard.unread'), value: stats.unread, icon: <HiOutlineEye size={24} />, color: 'var(--status-unread)' },
+    { label: t('dashboard.inProgress'), value: stats.in_progress, icon: <HiOutlineClock size={24} />, color: 'var(--status-progress)' },
+    { label: t('dashboard.resolved'), value: stats.resolved, icon: <HiOutlineCheckCircle size={24} />, color: 'var(--status-resolved)' },
   ];
 
   const statusEntries = Object.entries(stats.by_status || {});
@@ -61,8 +63,8 @@ export default function Dashboard() {
   return (
     <div className="dashboard-page">
       <div className="dashboard-header animate-fade-in">
-        <h1>Dashboard</h1>
-        <p className="dashboard-subtitle">Overview of complaint statistics</p>
+        <h1>{t('dashboard.title')}</h1>
+        <p className="dashboard-subtitle">{t('dashboard.subtitle')}</p>
       </div>
 
       {/* Stat Cards */}
@@ -86,11 +88,11 @@ export default function Dashboard() {
       <div className="dashboard-grid">
         {/* Status Distribution */}
         <div className="dashboard-chart glass-card animate-fade-in-up stagger-2">
-          <h3 className="chart-title">By Status</h3>
+          <h3 className="chart-title">{t('dashboard.byStatus')}</h3>
           <div className="bar-chart">
             {statusEntries.map(([status, count]) => (
               <div key={status} className="bar-row">
-                <span className="bar-label">{status.replace('_', ' ')}</span>
+                <span className="bar-label">{t(`status.${status}`) || status}</span>
                 <div className="bar-track">
                   <div
                     className="bar-fill"
@@ -104,18 +106,18 @@ export default function Dashboard() {
               </div>
             ))}
             {statusEntries.length === 0 && (
-              <p className="chart-empty">No data available</p>
+              <p className="chart-empty">{t('dashboard.noData')}</p>
             )}
           </div>
         </div>
 
         {/* Priority Distribution */}
         <div className="dashboard-chart glass-card animate-fade-in-up stagger-3">
-          <h3 className="chart-title">By Priority</h3>
+          <h3 className="chart-title">{t('dashboard.byPriority')}</h3>
           <div className="bar-chart">
             {priorityEntries.map(([priority, count]) => (
               <div key={priority} className="bar-row">
-                <span className="bar-label">{priority}</span>
+                <span className="bar-label">{t(`priority.${priority}`) || priority}</span>
                 <div className="bar-track">
                   <div
                     className="bar-fill"
@@ -129,14 +131,14 @@ export default function Dashboard() {
               </div>
             ))}
             {priorityEntries.length === 0 && (
-              <p className="chart-empty">No data available</p>
+              <p className="chart-empty">{t('dashboard.noData')}</p>
             )}
           </div>
         </div>
 
         {/* Source Distribution */}
         <div className="dashboard-chart glass-card animate-fade-in-up stagger-4">
-          <h3 className="chart-title">Submission Source</h3>
+          <h3 className="chart-title">{t('dashboard.submissionSource')}</h3>
           <div className="source-stats">
             <div className="source-item">
               <div className="source-ring">
@@ -158,7 +160,7 @@ export default function Dashboard() {
                 </svg>
                 <span className="source-ring-value">{stats.by_source.anonymous}</span>
               </div>
-              <span className="source-label">Anonymous</span>
+              <span className="source-label">{t('dashboard.anonymous')}</span>
             </div>
             <div className="source-item">
               <div className="source-ring">
@@ -180,7 +182,7 @@ export default function Dashboard() {
                 </svg>
                 <span className="source-ring-value">{stats.by_source.verified}</span>
               </div>
-              <span className="source-label">Verified</span>
+              <span className="source-label">{t('dashboard.verified')}</span>
             </div>
           </div>
         </div>

@@ -1,0 +1,188 @@
+{
+  "union_parishads": [
+    {
+      "name": "সানোরা ইউনিয়ন পরিষদ",
+      "district": "ঢাকা",
+      "upazila": "ধামরাই",
+      "union_name": "সানোরা",
+      "chairman_name": "Selim Uddin",
+      "contact_phone": "+8801933333333",
+      "contact_email": "selim@example.com",
+      "address": "Sanora, Dhamrai, Dhaka"
+    },
+    {
+      "name": "কুশুরা ইউনিয়ন পরিষদ",
+      "district": "ঢাকা",
+      "upazila": "ধামরাই",
+      "union_name": "কুশুরা",
+      "chairman_name": "Abul Kashem",
+      "contact_phone": "+8801744444444",
+      "contact_email": "kashem@example.com",
+      "address": "Kushura, Dhamrai, Dhaka"
+    }
+  ],
+  "users": [
+    {
+      "username": "citizen_rahim",
+      "email": "rahim@example.com",
+      "password": "Password123!",
+      "first_name": "Rahim",
+      "last_name": "Khan",
+      "phone_number": "+8801711111111",
+      "nid_number": "1234567890",
+      "nid_name": "Rahim Khan",
+      "nid_address": "House 12, Road 5, Sanora, Dhamrai, Dhaka",
+      "nid_verified": true,
+      "is_up_member": false,
+      "is_chairman": false
+    },
+    {
+      "username": "citizen_karim",
+      "email": "karim@example.com",
+      "password": "Password123!",
+      "first_name": "Karim",
+      "last_name": "Ahmed",
+      "phone_number": "+8801822222222",
+      "nid_number": "2345678901",
+      "nid_name": "Karim Ahmed",
+      "nid_address": "Word No. 3, Sanora UP, Dhamrai, Dhaka",
+      "nid_verified": true,
+      "is_up_member": false,
+      "is_chairman": false
+    },
+    {
+      "username": "member_jamil",
+      "email": "jamil@example.com",
+      "password": "Password123!",
+      "first_name": "Jamil",
+      "last_name": "Hasan",
+      "phone_number": "+8801555555555",
+      "is_up_member": true,
+      "is_chairman": false
+    },
+    {
+      "username": "chairman_selim",
+      "email": "selim@example.com",
+      "password": "Password123!",
+      "first_name": "Selim",
+      "last_name": "Uddin",
+      "phone_number": "+8801933333333",
+      "nid_number": "3456789012",
+      "nid_name": "Selim Uddin",
+      "nid_address": "Chairman House, Sanora, Dhamrai, Dhaka",
+      "nid_verified": true,
+      "is_up_member": true,
+      "is_chairman": true
+    }
+  ],
+  "complaints": [
+    {
+      "ref_id": "complaint_1",
+      "union_name": "সানোরা",
+      "complainant_username": "citizen_rahim",
+      "is_anonymous": false,
+      "subject": "Road Repair in Ward 2",
+      "body": "The main road in Ward 2 is severely damaged after the heavy monsoon. Potholes make it extremely difficult for vehicles and elderly people to commute. We request immediate repairs.",
+      "status": "IN_PROGRESS",
+      "priority": "HIGH",
+      "nid_verification_status": "VERIFIED",
+      "admin_notes": "Assigned to Ward 2 member for site inspection."
+    },
+    {
+      "ref_id": "complaint_2",
+      "union_name": "সানোরা",
+      "complainant_username": null,
+      "is_anonymous": true,
+      "subject": "Illegal Dumping Near Canal",
+      "body": "Some local businesses are dumping waste near the canal, causing severe pollution and bad smell in the area. Please take immediate legal actions.",
+      "status": "UNREAD",
+      "priority": "MEDIUM",
+      "nid_verification_status": "PENDING"
+    },
+    {
+      "ref_id": "complaint_3",
+      "union_name": "সানোরা",
+      "complainant_username": "citizen_karim",
+      "is_anonymous": false,
+      "subject": "Street Light Maintenance",
+      "body": "Street lights in our lane are not working for the last three weeks, creating security risks at night. Requesting replacement of the bulbs.",
+      "status": "RESOLVED",
+      "priority": "LOW",
+      "nid_verification_status": "VERIFIED",
+      "admin_notes": "Bulbs replaced on 2026-06-20 by UP maintenance staff."
+    },
+    {
+      "ref_id": "complaint_4",
+      "union_name": "সানোরা",
+      "complainant_username": "citizen_rahim",
+      "is_anonymous": false,
+      "subject": "Water Logging Issue",
+      "body": "Water logging occurs even after brief rain due to clogged drains near the marketplace. Drains need cleaning.",
+      "status": "ESCALATED",
+      "priority": "HIGH",
+      "nid_verification_status": "VERIFIED",
+      "admin_notes": "Referred to the Chairman due to funding requirements."
+    }
+  ],
+  "attachments": [
+    {
+      "complaint_ref_id": "complaint_1",
+      "file_url": "http://127.0.0.1:9000/postbox-uploads/road_damage_1.jpg",
+      "object_key": "road_damage_1.jpg",
+      "file_name": "road_damage_1.jpg",
+      "file_type": "image/jpeg",
+      "file_size": 1048576
+    },
+    {
+      "complaint_ref_id": "complaint_2",
+      "file_url": "http://127.0.0.1:9000/postbox-uploads/dumping_evidence.jpg",
+      "object_key": "dumping_evidence.jpg",
+      "file_name": "dumping_evidence.jpg",
+      "file_type": "image/jpeg",
+      "file_size": 2048576
+    }
+  ],
+  "status_logs": [
+    {
+      "complaint_ref_id": "complaint_1",
+      "old_status": "UNREAD",
+      "new_status": "UNDER_REVIEW",
+      "changed_by_username": "member_jamil",
+      "notes": "Reviewed the complaint details and verified the photos."
+    },
+    {
+      "complaint_ref_id": "complaint_1",
+      "old_status": "UNDER_REVIEW",
+      "new_status": "IN_PROGRESS",
+      "changed_by_username": "member_jamil",
+      "notes": "Work order issued to contractor."
+    },
+    {
+      "complaint_ref_id": "complaint_4",
+      "old_status": "UNREAD",
+      "new_status": "UNDER_REVIEW",
+      "changed_by_username": "member_jamil",
+      "notes": "Reviewed, needs budget approval."
+    },
+    {
+      "complaint_ref_id": "complaint_4",
+      "old_status": "UNDER_REVIEW",
+      "new_status": "ESCALATED",
+      "changed_by_username": "member_jamil",
+      "notes": "Escalating to Chairman for budget discussion."
+    }
+  ],
+  "nid_tasks": [
+    {
+      "complaint_ref_id": "complaint_1",
+      "celery_task_id": "task-uuid-1111-2222",
+      "nid_image_url": "http://127.0.0.1:9000/postbox-uploads/rahim_nid.jpg",
+      "nid_image_object_key": "rahim_nid.jpg",
+      "status": "VERIFIED",
+      "extracted_name": "Rahim Khan",
+      "extracted_address": "House 12, Road 5, Sanora, Dhamrai, Dhaka",
+      "extracted_nid_number": "1234567890",
+      "jurisdiction_match": true
+    }
+  ]
+}

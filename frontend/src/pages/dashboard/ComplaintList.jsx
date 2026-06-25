@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../context/LanguageContext';
 import complaintService from '../../api/complaintService';
 import { StatusBadge, PriorityBadge } from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
@@ -9,6 +10,7 @@ import { HiOutlineFunnel, HiOutlineArrowPath } from 'react-icons/hi2';
 import './ComplaintList.css';
 
 export default function ComplaintList() {
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,8 +57,8 @@ export default function ComplaintList() {
     <div className="complaint-list-page">
       <div className="cl-header">
         <div>
-          <h1>Complaints</h1>
-          <p className="dashboard-subtitle">Manage all submitted complaints</p>
+          <h1>{t('cl.header')}</h1>
+          <p className="dashboard-subtitle">{t('cl.subtitle')}</p>
         </div>
         <div className="cl-header-actions">
           <Button
@@ -65,7 +67,7 @@ export default function ComplaintList() {
             icon={<HiOutlineArrowPath size={16} />}
             onClick={loadComplaints}
           >
-            Refresh
+            {t('cl.refresh')}
           </Button>
           <Button
             variant={showFilters ? 'glass' : 'ghost'}
@@ -73,7 +75,7 @@ export default function ComplaintList() {
             icon={<HiOutlineFunnel size={16} />}
             onClick={() => setShowFilters(!showFilters)}
           >
-            Filter
+            {t('cl.filter')}
             {hasActiveFilters && <span className="filter-dot" />}
           </Button>
         </div>
@@ -83,42 +85,46 @@ export default function ComplaintList() {
       {showFilters && (
         <div className="cl-filters glass-card animate-fade-in">
           <div className="cl-filter-group">
-            <label className="form-label">Status</label>
+            <label className="form-label">{t('cl.status')}</label>
             <select
               value={filters.status}
               onChange={(e) => { setFilters(f => ({ ...f, status: e.target.value })); setPage(1); }}
             >
-              <option value="">All Statuses</option>
+              <option value="">{t('cl.allStatuses')}</option>
               {STATUS_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                <option key={opt.value} value={opt.value}>
+                  {t(`status.${opt.value}`) || opt.label}
+                </option>
               ))}
             </select>
           </div>
           <div className="cl-filter-group">
-            <label className="form-label">Priority</label>
+            <label className="form-label">{t('cl.priority')}</label>
             <select
               value={filters.priority}
               onChange={(e) => { setFilters(f => ({ ...f, priority: e.target.value })); setPage(1); }}
             >
-              <option value="">All Priorities</option>
+              <option value="">{t('cl.allPriorities')}</option>
               {PRIORITY_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                <option key={opt.value} value={opt.value}>
+                  {t(`priority.${opt.value}`) || opt.label}
+                </option>
               ))}
             </select>
           </div>
           <div className="cl-filter-group">
-            <label className="form-label">Source</label>
+            <label className="form-label">{t('cl.source')}</label>
             <select
               value={filters.is_anonymous}
               onChange={(e) => { setFilters(f => ({ ...f, is_anonymous: e.target.value })); setPage(1); }}
             >
-              <option value="">All Sources</option>
-              <option value="true">Anonymous</option>
-              <option value="false">Verified</option>
+              <option value="">{t('cl.allSources')}</option>
+              <option value="true">{t('cl.anonymous')}</option>
+              <option value="false">{t('cl.verified')}</option>
             </select>
           </div>
           {hasActiveFilters && (
-            <Button variant="ghost" size="sm" onClick={clearFilters}>Clear</Button>
+            <Button variant="ghost" size="sm" onClick={clearFilters}>{t('common.clear')}</Button>
           )}
         </div>
       )}
@@ -128,9 +134,9 @@ export default function ComplaintList() {
         <PageSpinner />
       ) : complaints.length === 0 ? (
         <div className="cl-empty glass-card animate-fade-in">
-          <p>No complaints found</p>
+          <p>{t('cl.noComplaints')}</p>
           {hasActiveFilters && (
-            <Button variant="ghost" size="sm" onClick={clearFilters}>Clear Filters</Button>
+            <Button variant="ghost" size="sm" onClick={clearFilters}>{t('cl.clearFilters')}</Button>
           )}
         </div>
       ) : (
@@ -139,11 +145,11 @@ export default function ComplaintList() {
             <table className="cl-table" id="complaints-table">
               <thead>
                 <tr>
-                  <th>Subject</th>
-                  <th>Status</th>
-                  <th>Priority</th>
-                  <th>Complainant</th>
-                  <th>Date</th>
+                  <th>{t('cl.subject')}</th>
+                  <th>{t('cl.status')}</th>
+                  <th>{t('cl.priority')}</th>
+                  <th>{t('cl.complainant')}</th>
+                  <th>{t('cl.date')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -165,7 +171,7 @@ export default function ComplaintList() {
                     <td><PriorityBadge priority={c.priority} /></td>
                     <td>
                       <span className={`cl-source ${c.is_anonymous ? 'cl-anon' : 'cl-verified'}`}>
-                        {c.complainant_name}
+                        {c.is_anonymous ? t('cl.anonymous') : (c.complainant_name || c.complainant?.display_name || c.complainant?.username)}
                       </span>
                     </td>
                     <td>
@@ -188,10 +194,10 @@ export default function ComplaintList() {
                 disabled={page <= 1}
                 onClick={() => setPage(p => p - 1)}
               >
-                Previous
+                {t('cl.previous')}
               </Button>
               <span className="cl-page-info">
-                Page {page} of {totalPages}
+                {t('cl.pageOf').replace('{page}', page).replace('{totalPages}', totalPages)}
               </span>
               <Button
                 variant="ghost"
@@ -199,7 +205,7 @@ export default function ComplaintList() {
                 disabled={page >= totalPages}
                 onClick={() => setPage(p => p + 1)}
               >
-                Next
+                {t('cl.next')}
               </Button>
             </div>
           )}

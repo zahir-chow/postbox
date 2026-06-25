@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import {
   HiOutlineSquares2X2,
   HiOutlineDocumentText,
@@ -9,17 +10,18 @@ import './Sidebar.css';
 
 export default function Sidebar() {
   const { user, isChairman } = useAuth();
+  const { t } = useLanguage();
 
   const navItems = [
-    { to: '/dashboard', icon: <HiOutlineSquares2X2 size={20} />, label: 'Overview', end: true },
-    { to: '/dashboard/complaints', icon: <HiOutlineDocumentText size={20} />, label: 'Complaints' },
+    { to: '/dashboard', icon: <HiOutlineSquares2X2 size={20} />, label: t('sidebar.overview'), end: true },
+    { to: '/dashboard/complaints', icon: <HiOutlineDocumentText size={20} />, label: t('sidebar.complaints') },
   ];
 
   return (
     <aside className="sidebar" id="dashboard-sidebar">
       <div className="sidebar-header">
         <div className="sidebar-role-badge">
-          {isChairman ? '👑 Chairman' : '🏛️ UP Member'}
+          {isChairman ? t('sidebar.chairman') : t('sidebar.upMember')}
         </div>
         <p className="sidebar-user-name">{user?.display_name || user?.username}</p>
       </div>
@@ -43,7 +45,7 @@ export default function Sidebar() {
       <div className="sidebar-footer">
         <div className="sidebar-status">
           <HiOutlineBell size={16} />
-          <span>Real-time alerts active</span>
+          <span>{t('sidebar.alertsActive')}</span>
         </div>
       </div>
     </aside>

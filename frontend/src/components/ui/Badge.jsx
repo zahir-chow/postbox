@@ -1,27 +1,30 @@
 import { STATUS_CONFIG, PRIORITY_CONFIG } from '../../utils/helpers';
+import { useLanguage } from '../../context/LanguageContext';
 import './Badge.css';
 
 export function StatusBadge({ status }) {
-  const config = STATUS_CONFIG[status] || { label: status, color: 'var(--text-secondary)', bg: 'var(--surface)' };
+  const { t } = useLanguage();
+  const config = STATUS_CONFIG[status] || { color: 'var(--text-secondary)', bg: 'var(--surface)' };
   return (
     <span
       className="badge status-badge"
       style={{ color: config.color, backgroundColor: config.bg }}
     >
       <span className="badge-dot" style={{ backgroundColor: config.color }} />
-      {config.label}
+      {t(`status.${status}`)}
     </span>
   );
 }
 
 export function PriorityBadge({ priority }) {
-  const config = PRIORITY_CONFIG[priority] || { label: priority, color: 'var(--text-secondary)' };
+  const { t } = useLanguage();
+  const config = PRIORITY_CONFIG[priority] || { color: 'var(--text-secondary)' };
   return (
     <span
       className="badge priority-badge"
       style={{ color: config.color, borderColor: config.color }}
     >
-      {config.label}
+      {t(`priority.${priority}`)}
     </span>
   );
 }

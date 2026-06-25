@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useLanguage } from '../../context/LanguageContext';
 import { HiOutlineMagnifyingGlass } from 'react-icons/hi2';
 import Button from '../../components/ui/Button';
 import { StatusBadge, PriorityBadge } from '../../components/ui/Badge';
@@ -10,6 +11,7 @@ import { formatDate, STATUS_CONFIG } from '../../utils/helpers';
 import './TrackComplaint.css';
 
 export default function TrackComplaint() {
+  const { t, language } = useLanguage();
   const [searchParams] = useSearchParams();
   const [token, setToken] = useState(searchParams.get('token') || '');
   const [complaint, setComplaint] = useState(null);
@@ -24,7 +26,9 @@ export default function TrackComplaint() {
 
   const handleTrack = async (trackingToken = token) => {
     if (!trackingToken.trim()) {
-      toast.error('Please enter a tracking token');
+      toast.error(
+        language === 'en' ? 'Please enter a tracking token' : 'অনুগ্রহ করে একটি ট্র্যাকিং টোকেন প্রবেশ করান'
+      );
       return;
     }
 
@@ -35,9 +39,13 @@ export default function TrackComplaint() {
       setComplaint(data);
     } catch (err) {
       if (err.response?.status === 404) {
-        toast.error('No complaint found with this tracking token');
+        toast.error(
+          language === 'en' ? 'No complaint found with this tracking token' : 'এই ট্র্যাকিং টোকেনের কোনো অভিযোগ পাওয়া যায়নি'
+        );
       } else {
-        toast.error('Failed to track complaint');
+        toast.error(
+          language === 'en' ? 'Failed to track complaint' : 'অভিযোগ ট্র্যাক করতে ব্যর্থ হয়েছে'
+        );
       }
       setComplaint(null);
     } finally {
@@ -50,8 +58,8 @@ export default function TrackComplaint() {
       <div className="container">
         <div className="track-wrapper">
           <div className="track-header animate-fade-in">
-            <h1>Track Your <span className="gradient-text">Complaint</span></h1>
-            <p>Enter your tracking token to see the current status of your complaint.</p>
+            <h1>{t('track.titlePart1')}<span className="gradient-text">{t('track.titlePart2')}</span></h1>
+            <p>{t('track.subtitle')}</p>
           </div>
 
           <div className="track-search glass-card animate-fade-in-up">
@@ -59,7 +67,7 @@ export default function TrackComplaint() {
               <input
                 id="tracking-token-input"
                 type="text"
-                placeholder="Enter your tracking token (UUID)…"
+                placeholder={t('track.placeholderToken')}
                 value={token}
                 onChange={(e) => setToken(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleTrack()}
@@ -70,7 +78,7 @@ export default function TrackComplaint() {
                 onClick={() => handleTrack()}
                 icon={<HiOutlineMagnifyingGlass size={18} />}
               >
-                Track
+                {t('track.btnTrack')}
               </Button>
             </div>
           </div>
@@ -85,7 +93,7 @@ export default function TrackComplaint() {
                 <div className="track-status-header">
                   <div>
                     <h3 className="track-subject">{complaint.subject}</h3>
-                    <p className="track-date">Submitted {formatDate(complaint.created_at)}</p>
+                    <p className="track-date">{t('track.submitted')} {formatDate(complaint.created_at)}</p>
                   </div>
                   <div className="track-badges">
                     <StatusBadge status={complaint.status} />
@@ -95,18 +103,20 @@ export default function TrackComplaint() {
 
                 {complaint.resolved_at && (
                   <div className="track-resolved">
-                    ✅ Resolved on {formatDate(complaint.resolved_at)}
+                    ✅ {t('track.resolvedOn')} {formatDate(complaint.resolved_at)}
                   </div>
                 )}
 
                 <div className="track-meta">
                   <div className="track-meta-item">
-                    <span className="track-meta-label">Attachments</span>
+                    <span className="track-meta-label">{t('track.attachments')}</span>
                     <span className="track-meta-value">{complaint.attachment_count || 0}</span>
                   </div>
                   <div className="track-meta-item">
-                    <span className="track-meta-label">NID Status</span>
-                    <span className="track-meta-value">{complaint.nid_verification_status || 'N/A'}</span>
+                    <span className="track-meta-label">{t('track.nidStatus')}</span>
+                    <span className="track-meta-value">
+                      {complaint.nid_verification_status ? t(`status.${complaint.nid_verification_status}`) : '—'}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -114,7 +124,7 @@ export default function TrackComplaint() {
               {/* Status Timeline */}
               {complaint.status_logs && complaint.status_logs.length > 0 && (
                 <div className="track-timeline glass-card">
-                  <h3 className="track-timeline-title">Status Timeline</h3>
+                  <h3 className="track-timeline-title">{t('track.timeline')}</h3>
                   <div className="timeline">
                     {complaint.status_logs.map((log, i) => {
                       const config = STATUS_CONFIG[log.new_status] || {};
@@ -128,15 +138,15 @@ export default function TrackComplaint() {
                           <div className="timeline-content">
                             <div className="timeline-header">
                               <span className="timeline-status" style={{ color: config.color }}>
-                                {config.label || log.new_status}
+                                {t(`status.${log.new_status}`)}
                               </span>
                               <span className="timeline-date">{formatDate(log.created_at)}</span>
                             </div>
                             <p className="timeline-from">
-                              From: {STATUS_CONFIG[log.old_status]?.label || log.old_status}
+                              {t('track.from')}: {t(`status.${log.old_status}`)}
                             </p>
                             {log.notes && <p className="timeline-notes">{log.notes}</p>}
-                            <p className="timeline-by">By: {log.changed_by_name}</p>
+                            <p className="timeline-by">{t('track.by')}: {log.changed_by_name}</p>
                           </div>
                         </div>
                       );
@@ -149,7 +159,7 @@ export default function TrackComplaint() {
 
           {!loading && searched && !complaint && (
             <div className="track-empty glass-card animate-fade-in">
-              <p>No complaint found. Please double-check your tracking token.</p>
+              <p>{t('track.empty')}</p>
             </div>
           )}
         </div>

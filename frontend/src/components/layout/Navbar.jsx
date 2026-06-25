@@ -1,11 +1,13 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { HiOutlineEnvelope, HiOutlineMagnifyingGlass, HiOutlineArrowRightOnRectangle, HiOutlineSquares2X2, HiOutlineBars3 } from 'react-icons/hi2';
 import { useState } from 'react';
 import './Navbar.css';
 
 export default function Navbar() {
   const { isAuthenticated, isAdmin, user, logout } = useAuth();
+  const { language, toggleLanguage, t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -25,7 +27,7 @@ export default function Navbar() {
             <HiOutlineEnvelope size={24} />
           </div>
           <span className="navbar-brand-text">
-            <span className="gradient-text">PostBox</span>
+            <span className="gradient-text">{t('nav.brand')}</span>
           </span>
         </Link>
 
@@ -39,25 +41,35 @@ export default function Navbar() {
 
         <div className={`navbar-menu ${mobileMenuOpen ? 'navbar-menu-open' : ''}`}>
           <div className="navbar-links">
-            <Link
-              to="/submit"
-              className={`navbar-link ${isActive('/submit') ? 'active' : ''}`}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <HiOutlineEnvelope size={18} />
-              Submit
-            </Link>
+            {!isAdmin && (
+              <Link
+                to="/submit"
+                className={`navbar-link ${isActive('/submit') ? 'active' : ''}`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <HiOutlineEnvelope size={18} />
+                {t('nav.submit')}
+              </Link>
+            )}
             <Link
               to="/track"
               className={`navbar-link ${isActive('/track') ? 'active' : ''}`}
               onClick={() => setMobileMenuOpen(false)}
             >
               <HiOutlineMagnifyingGlass size={18} />
-              Track
+              {t('nav.track')}
             </Link>
           </div>
 
           <div className="navbar-actions">
+            <button
+              onClick={toggleLanguage}
+              className="btn btn-glass btn-sm lang-toggle"
+              style={{ minWidth: '40px', padding: '0 8px', fontWeight: 'bold' }}
+              title={language === 'en' ? 'Bangla' : 'English'}
+            >
+              {language === 'en' ? 'BN' : 'EN'}
+            </button>
             {isAuthenticated ? (
               <>
                 {isAdmin && (
@@ -67,7 +79,7 @@ export default function Navbar() {
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <HiOutlineSquares2X2 size={18} />
-                    Dashboard
+                    {t('nav.dashboard')}
                   </Link>
                 )}
                 <div className="navbar-user">
@@ -78,7 +90,7 @@ export default function Navbar() {
                     {user?.display_name || user?.username}
                   </span>
                 </div>
-                <button className="navbar-logout" onClick={handleLogout} title="Logout">
+                <button className="navbar-logout" onClick={handleLogout} title={t('nav.logout')}>
                   <HiOutlineArrowRightOnRectangle size={20} />
                 </button>
               </>
@@ -88,7 +100,7 @@ export default function Navbar() {
                 className="btn btn-glass btn-sm"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Login
+                {t('nav.login')}
               </Link>
             )}
           </div>

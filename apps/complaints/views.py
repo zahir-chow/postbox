@@ -143,11 +143,16 @@ class ComplaintListView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
 
-        if user.is_up_member or user.is_chairman:
-            # Admin and Chairman see all complaints
+        if user.is_chairman:
+            # Chairman sees only escalated complaints
             qs = Complaint.objects.select_related(
                 "union_parishad", "complainant"
-            ).all()
+            ).filter(status=ComplaintStatus.ESCALATED)
+        elif user.is_up_member:
+            # UP Member sees all complaints except escalated ones
+            qs = Complaint.objects.select_related(
+                "union_parishad", "complainant"
+            ).exclude(status=ComplaintStatus.ESCALATED)
         else:
             # Regular user sees only their complaints
             qs = Complaint.objects.select_related(
@@ -348,33 +353,43 @@ class AdminDashboardStatsView(APIView):
     permission_classes = [permissions.IsAuthenticated, IsUPMember]
 
     def get(self, request):
+        user = request.user
+
+        # Base query filtered by user type
+        if user.is_chairman:
+            base_qs = Complaint.objects.filter(status=ComplaintStatus.ESCALATED)
+        elif user.is_up_member:
+            base_qs = Complaint.objects.exclude(status=ComplaintStatus.ESCALATED)
+        else:
+            base_qs = Complaint.objects.filter(complainant=user)
+
         # Status distribution
         status_counts = (
-            Complaint.objects.values("status")
+            base_qs.values("status")
             .annotate(count=Count("id"))
             .order_by("status")
         )
 
         # Priority distribution
         priority_counts = (
-            Complaint.objects.values("priority")
+            base_qs.values("priority")
             .annotate(count=Count("id"))
             .order_by("priority")
         )
 
         # Anonymous vs. verified
         source_counts = (
-            Complaint.objects.values("is_anonymous")
+            base_qs.values("is_anonymous")
             .annotate(count=Count("id"))
         )
 
         # Total counts
-        total = Complaint.objects.count()
-        unread = Complaint.objects.filter(status=ComplaintStatus.UNREAD).count()
-        in_progress = Complaint.objects.filter(
+        total = base_qs.count()
+        unread = base_qs.filter(status=ComplaintStatus.UNREAD).count()
+        in_progress = base_qs.filter(
             status__in=[ComplaintStatus.UNDER_REVIEW, ComplaintStatus.IN_PROGRESS]
         ).count()
-        resolved = Complaint.objects.filter(status=ComplaintStatus.RESOLVED).count()
+        resolved = base_qs.filter(status=ComplaintStatus.RESOLVED).count()
 
         return Response(
             {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useLanguage } from '../../context/LanguageContext';
 import {
   HiOutlineArrowLeft,
   HiOutlinePaperClip,
@@ -26,6 +27,7 @@ export default function ComplaintDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
+  const { t, language } = useLanguage();
   const [complaint, setComplaint] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
@@ -50,10 +52,14 @@ export default function ComplaintDetail() {
       setAdminNotes(data.admin_notes || '');
     } catch (err) {
       if (err.response?.status === 404) {
-        toast.error('Complaint not found');
+        toast.error(
+          language === 'en' ? 'Complaint not found' : 'অভিযোগটি পাওয়া যায়নি'
+        );
         navigate('/dashboard/complaints');
       } else {
-        toast.error('Failed to load complaint');
+        toast.error(
+          language === 'en' ? 'Failed to load complaint' : 'অভিযোগ লোড করতে ব্যর্থ হয়েছে'
+        );
       }
     } finally {
       setLoading(false);
@@ -62,7 +68,9 @@ export default function ComplaintDetail() {
 
   const handleStatusUpdate = async () => {
     if (newStatus === complaint.status && newPriority === complaint.priority && !notes.trim()) {
-      toast.error('No changes to save');
+      toast.error(
+        language === 'en' ? 'No changes to save' : 'সংরক্ষণের জন্য কোনো পরিবর্তন করা হয়নি'
+      );
       return;
     }
 
@@ -74,11 +82,15 @@ export default function ComplaintDetail() {
         priority: newPriority !== complaint.priority ? newPriority : undefined,
         admin_notes: adminNotes,
       });
-      toast.success('Complaint updated!');
+      toast.success(
+        language === 'en' ? 'Complaint updated!' : 'অভিযোগ আপডেট করা হয়েছে!'
+      );
       setNotes('');
       await loadComplaint();
     } catch {
-      toast.error('Failed to update complaint');
+      toast.error(
+        language === 'en' ? 'Failed to update complaint' : 'অভিযোগ আপডেট করতে ব্যর্থ হয়েছে'
+      );
     } finally {
       setUpdating(false);
     }
@@ -93,7 +105,7 @@ export default function ComplaintDetail() {
       <div className="cd-header animate-fade-in">
         <button className="cd-back" onClick={() => navigate('/dashboard/complaints')}>
           <HiOutlineArrowLeft size={20} />
-          Back to Complaints
+          {t('cd.back')}
         </button>
         <div className="cd-header-main">
           <div className="cd-header-left">
@@ -101,16 +113,16 @@ export default function ComplaintDetail() {
             <div className="cd-header-meta">
               <StatusBadge status={complaint.status} />
               <PriorityBadge priority={complaint.priority} />
-              <span className="cd-date">Submitted {formatDate(complaint.created_at)}</span>
+              <span className="cd-date">{t('track.submitted')} {formatDate(complaint.created_at)}</span>
             </div>
           </div>
           <div className="cd-tracking">
-            <span className="cd-tracking-label">Tracking Token</span>
+            <span className="cd-tracking-label">{t('cd.trackingToken')}</span>
             <button
               className="cd-tracking-token"
               onClick={() => {
                 copyToClipboard(complaint.tracking_token);
-                toast.success('Copied!');
+                toast.success(t('common.copied'));
               }}
               title="Click to copy"
             >
@@ -126,15 +138,15 @@ export default function ComplaintDetail() {
         <div className="cd-main">
           {/* Complaint Body */}
           <div className="cd-section glass-card animate-fade-in-up stagger-1">
-            <h3 className="cd-section-title">Complaint Details</h3>
+            <h3 className="cd-section-title">{t('cd.title')}</h3>
             <div className="cd-info-row">
-              <span className="cd-info-label">Union Parishad</span>
+              <span className="cd-info-label">{t('submit.labelUP')}</span>
               <span className="cd-info-value">{complaint.union_parishad?.name || '—'}</span>
             </div>
             <div className="cd-info-row">
-              <span className="cd-info-label">Complainant</span>
+              <span className="cd-info-label">{t('cd.complainant')}</span>
               <span className="cd-info-value">
-                {complaint.is_anonymous ? '🕶️ Anonymous' : complaint.complainant_name}
+                {complaint.is_anonymous ? t('submit.identityAnonTitle') : (complaint.complainant_name || complaint.complainant?.display_name || complaint.complainant?.username)}
               </span>
             </div>
             <div className="cd-body-content">
@@ -147,7 +159,7 @@ export default function ComplaintDetail() {
             <div className="cd-section glass-card animate-fade-in-up stagger-2">
               <h3 className="cd-section-title">
                 <HiOutlinePaperClip size={18} />
-                Attachments ({complaint.attachments.length})
+                {t('submit.reviewAttachments')} ({complaint.attachments.length})
               </h3>
               <div className="cd-attachments">
                 {complaint.attachments.map((att) => (
@@ -180,30 +192,30 @@ export default function ComplaintDetail() {
             <div className="cd-section glass-card animate-fade-in-up stagger-3">
               <h3 className="cd-section-title">
                 <HiOutlineIdentification size={18} />
-                NID Verification
+                {t('cd.nidVerification')}
               </h3>
               <div className="cd-nid-info">
                 <div className="cd-info-row">
-                  <span className="cd-info-label">Status</span>
+                  <span className="cd-info-label">{t('cl.status')}</span>
                   <StatusBadge status={complaint.nid_task.status} />
                 </div>
                 {complaint.nid_task.extracted_name && (
                   <div className="cd-info-row">
-                    <span className="cd-info-label">Extracted Name</span>
+                    <span className="cd-info-label">{t('cd.extractedName')}</span>
                     <span className="cd-info-value">{complaint.nid_task.extracted_name}</span>
                   </div>
                 )}
                 {complaint.nid_task.jurisdiction_match !== null && (
                   <div className="cd-info-row">
-                    <span className="cd-info-label">Jurisdiction Match</span>
+                    <span className="cd-info-label">{t('cd.jurisdictionMatch')}</span>
                     <span className="cd-info-value">
-                      {complaint.nid_task.jurisdiction_match ? '✅ Yes' : '❌ No'}
+                      {complaint.nid_task.jurisdiction_match ? `✅ ${t('cd.yes')}` : `❌ ${t('cd.no')}`}
                     </span>
                   </div>
                 )}
                 {complaint.nid_task.error_message && (
                   <div className="cd-info-row">
-                    <span className="cd-info-label">Error</span>
+                    <span className="cd-info-label">{t('cd.error')}</span>
                     <span className="cd-info-value cd-error-text">{complaint.nid_task.error_message}</span>
                   </div>
                 )}
@@ -214,7 +226,7 @@ export default function ComplaintDetail() {
           {/* Status Timeline */}
           {complaint.status_logs && complaint.status_logs.length > 0 && (
             <div className="cd-section glass-card animate-fade-in-up stagger-4">
-              <h3 className="cd-section-title">Status Timeline</h3>
+              <h3 className="cd-section-title">{t('cd.statusLogs')}</h3>
               <div className="timeline">
                 {complaint.status_logs.map((log, i) => {
                   const config = STATUS_CONFIG[log.new_status] || {};
@@ -227,15 +239,15 @@ export default function ComplaintDetail() {
                       <div className="timeline-content">
                         <div className="timeline-header">
                           <span className="timeline-status" style={{ color: config.color }}>
-                            {config.label || log.new_status}
+                            {t(`status.${log.new_status}`) || log.new_status}
                           </span>
                           <span className="timeline-date">{formatDate(log.created_at)}</span>
                         </div>
                         <p className="timeline-from">
-                          From: {STATUS_CONFIG[log.old_status]?.label || log.old_status}
+                          {t('track.from')}: {t(`status.${log.old_status}`) || log.old_status}
                         </p>
                         {log.notes && <p className="timeline-notes">{log.notes}</p>}
-                        <p className="timeline-by">By: {log.changed_by_name}</p>
+                        <p className="timeline-by">{t('track.by')}: {log.changed_by_name}</p>
                       </div>
                     </div>
                   );
@@ -249,39 +261,43 @@ export default function ComplaintDetail() {
         {isAdmin && (
           <div className="cd-sidebar animate-slide-in-right">
             <div className="cd-action-panel glass-card">
-              <h3 className="cd-section-title">Admin Actions</h3>
+              <h3 className="cd-section-title">{t('cd.adminActions')}</h3>
 
               <div className="form-group">
-                <label className="form-label" htmlFor="cd-status">Update Status</label>
+                <label className="form-label" htmlFor="cd-status">{t('cd.updateStatus')}</label>
                 <select
                   id="cd-status"
                   value={newStatus}
                   onChange={(e) => setNewStatus(e.target.value)}
                 >
                   {STATUS_OPTIONS.map(opt => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    <option key={opt.value} value={opt.value}>
+                      {t(`status.${opt.value}`) || opt.label}
+                    </option>
                   ))}
                 </select>
               </div>
 
               <div className="form-group">
-                <label className="form-label" htmlFor="cd-priority">Priority</label>
+                <label className="form-label" htmlFor="cd-priority">{t('cl.priority')}</label>
                 <select
                   id="cd-priority"
                   value={newPriority}
                   onChange={(e) => setNewPriority(e.target.value)}
                 >
                   {PRIORITY_OPTIONS.map(opt => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    <option key={opt.value} value={opt.value}>
+                      {t(`priority.${opt.value}`) || opt.label}
+                    </option>
                   ))}
                 </select>
               </div>
 
               <div className="form-group">
-                <label className="form-label" htmlFor="cd-notes">Status Change Notes</label>
+                <label className="form-label" htmlFor="cd-notes">{t('cd.statusChangeNotes')}</label>
                 <textarea
                   id="cd-notes"
-                  placeholder="Reason for status change…"
+                  placeholder={t('cd.statusPlaceholder')}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={3}
@@ -289,10 +305,10 @@ export default function ComplaintDetail() {
               </div>
 
               <div className="form-group">
-                <label className="form-label" htmlFor="cd-admin-notes">Internal Notes</label>
+                <label className="form-label" htmlFor="cd-admin-notes">{t('cd.internalNotes')}</label>
                 <textarea
                   id="cd-admin-notes"
-                  placeholder="Notes visible only to admin…"
+                  placeholder={t('cd.internalPlaceholder')}
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
                   rows={3}
@@ -305,7 +321,7 @@ export default function ComplaintDetail() {
                 loading={updating}
                 onClick={handleStatusUpdate}
               >
-                Save Changes
+                {t('common.saveChanges')}
               </Button>
             </div>
           </div>
